@@ -163,10 +163,12 @@ def main():
     unprocessed_pkgs = {}
     final_pkgs = {}
     pkg_list = []
-    
+    user_desired_list = [] 
     avail = my.pkgSack.returnPackages()
     for item in user_pkg_list:
         exactmatch, matched, unmatched = parsePackages(avail, [item])
+        user_desired_list.extend(exactmatch)  # packageName-x.y.z
+        user_desired_list.extend(matched)     # those with wildcard : e.g. packageName-x.*
         pkg_list.extend(exactmatch)
         pkg_list.extend(matched)
         if opts.newest:
@@ -215,6 +217,7 @@ def main():
         download_list = this_sack.returnNewestByNameArch()
         
     download_list.sort(key=lambda pkg: pkg.name)
+    download_list.extend(user_desired_list) #regardless the newest filter result
     for pkg in download_list:
         repo = my.repos.getRepo(pkg.repoid)
         remote = pkg.returnSimple('relativepath')
